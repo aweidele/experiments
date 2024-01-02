@@ -3,14 +3,34 @@
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Input Types</title>
+    <style>
+      .wrapper {
+        max-width: 800px;
+        margin: auto;
+        padding: 0 20px;
+      }
+      input {
+        width: 100%;
+        padding: 10px 20px;
+        font-size: 18px;
+      }
+    </style>
   </head>
   <body>
-    <h1>Input types</h1>
-    <h2>Date</h2>
-    <input type="date" />
-    <h2>Time</h2>
-    <input type="time" />
-    <h2>Datetime Local</h2>
-    <input type="datetime-local" />
+    <div class="wrapper">
+      <h1>Input types</h1>
+      <label>
+        <h2>Date</h2>
+        <input type="date" id="input-date"
+      /></label>
+      <label
+        ><h2>Time</h2>
+        <input type="time" id="input-time"
+      /></label>
+      <label
+        ><h2>Datetime Local</h2>
+        <input type="datetime-local" id="input-datetime"
+      /></label>
+    </div>
   </body>
 </html>
