@@ -13,6 +13,7 @@
         width: 100%;
         padding: 10px 20px;
         font-size: 18px;
+        display: block;
       }
     </style>
   </head>
@@ -32,5 +33,11 @@
         <input type="datetime-local" id="input-datetime"
       /></label>
     </div>
+    <script>
+      const inputs = document.querySelectorAll("input");
+      inputs.forEach((input) => {
+        input.valueAsDate = new Date();
+      });
+    </script>
   </body>
 </html>
