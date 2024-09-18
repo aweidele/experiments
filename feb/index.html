@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Feb</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+      body {
+        font-family: "Montserrat", sans-serif;
+        font-optical-sizing: auto;
+        font-style: normal;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Feb</h1>
+    <p></p>
+    <ul id="feb"></ul>
+
+    <script>
+      const isLeapYear = (year) => {
+        const testDate = new Date(year, 1, 29);
+        return testDate.getMonth() === 1;
+      };
+      for (let i = 1980; i < 2080; i++) {
+        console.log(`${i}: ${isLeapYear(i)}`);
+      }
+
+      const feb = document.getElementById("feb");
+      const months = ["January", "February"];
+      const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+      const firstPayday = new Date(2008, 1, 1);
+      let last = 2008;
+
+      for (let i = 1904; i < 3004; i += 4) {
+        const li = document.createElement("li");
+        const febone = new Date(i, 1, 1);
+
+        const day = febone.getDay();
+        const isPayDay = day === 5 && !(((febone - firstPayday) / 1000 / 60 / 60 / 24 / 7) % 2);
+
+        if (day === 5) {
+          li.innerHTML = `${isPayDay ? "<strong>" : ""}${febone.getFullYear()} ${febone.getMonth()} – ${days[day]}${isPayDay ? `<strong> (${i - last})` : ""}`;
+          feb.appendChild(li);
+        }
+        if (isPayDay) last = i;
+      }
+    </script>
+  </body>
+</html>

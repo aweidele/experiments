@@ -35,8 +35,12 @@
     </div>
     <script>
       const inputs = document.querySelectorAll("input");
+      const now = new Date();
       inputs.forEach((input) => {
-        input.valueAsDate = new Date();
+        // input.valueAsDate = new Date();
+        input.addEventListener("change", (e) => {
+          console.log(e.target.valueAsDate);
+        });
       });
     </script>
   </body>
