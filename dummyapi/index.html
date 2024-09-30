@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Dummy API Test</title>
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="api.js"></script>
+  </head>
+  <body>
+    <div class="wrapper">
+      <h1>Dummy API Test</h1>
+      <div class="container">
+        <div class="submit">
+          <form id="sample-form">
+            <fieldset>
+              <label for="title">Title</label>
+              <input type="text" id="title" name="title" value="This is a sample value." />
+            </fieldset>
+            <fieldset>
+              <label for="userId">Select User</label>
+              <select id="userId" name="userId">
+                <option value="1">User 1</option>
+                <option value="2">User 2</option>
+                <option value="3">User 3</option>
+                <option value="4">User 4</option>
+              </select>
+            </fieldset>
+            <button>Submit</button>
+          </form>
+          <div id="response"></div>
+          <div id="submitted"></div>
+        </div>
+        <div class="posts">
+          <h2>Posts</h2>
+          <div></div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

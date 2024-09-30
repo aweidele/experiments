@@ -1,0 +1,29 @@
+.content {
+  max-width: 1000px;
+  padding: 0 20px;
+  margin: 50px auto;
+  display: flex;
+  justify-content: space-between;
+}
+
+.chart {
+  width: 500px;
+  height: 500px;
+}
+
+.ring {
+  stroke: darkviolet;
+  fill: transparent;
+}
+
+.form {
+  width: 40%;
+}
+
+.chartSVG {
+  g,
+  path {
+    /* stroke-width: 2px; */
+    /* stroke: #ffffff; */
+  }
+}

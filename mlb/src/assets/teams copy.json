@@ -1,0 +1,154 @@
+{
+  "teams": [
+    {
+      "team": "Cleveland Indians",
+      "last_win": 1948,
+      "last_appearance": null
+    },
+    {
+      "team": "Pittsburgh Pirates",
+      "last_win": 1979,
+      "last_appearance": null
+    },
+    {
+      "team": "Baltimore Orioles",
+      "last_win": 1983,
+      "last_appearance": null
+    },
+    {
+      "team": "Detroit Tigers",
+      "last_win": 1984,
+      "last_appearance": null
+    },
+    {
+      "team": "New York Mets",
+      "last_win": 1986,
+      "last_appearance": null
+    },
+    {
+      "team": "Oakland Athletics",
+      "last_win": 1989,
+      "last_appearance": null
+    },
+    {
+      "team": "Cincinnati Reds",
+      "last_win": 1990,
+      "last_appearance": null
+    },
+    {
+      "team": "Minnesota Twins",
+      "last_win": 1991,
+      "last_appearance": null
+    },
+    {
+      "team": "Toronto Blue Jays",
+      "last_win": 1993,
+      "last_appearance": null
+    },
+    {
+      "team": "Arizona Diamondbacks",
+      "last_win": 2001,
+      "last_appearance": null
+    },
+    {
+      "team": "Los Angeles Angels",
+      "last_win": 2002,
+      "last_appearance": null
+    },
+    {
+      "team": "Miami Marlins",
+      "last_win": 2003,
+      "last_appearance": null
+    },
+    {
+      "team": "Chicago White Sox",
+      "last_win": 2005,
+      "last_appearance": null
+    },
+    {
+      "team": "Philadelphia Phillies",
+      "last_win": 2008,
+      "last_appearance": null
+    },
+    {
+      "team": "New York Yankees",
+      "last_win": 2009,
+      "last_appearance": null
+    },
+    {
+      "team": "St. Louis Cardinals",
+      "last_win": 2011,
+      "last_appearance": null
+    },
+    {
+      "team": "San Francisco Giants",
+      "last_win": 2014,
+      "last_appearance": null
+    },
+    {
+      "team": "Kansas City Royals",
+      "last_win": 2015,
+      "last_appearance": null
+    },
+    {
+      "team": "Chicago Cubs",
+      "last_win": 2016,
+      "last_appearance": null
+    },
+    {
+      "team": "Boston Red Sox",
+      "last_win": 2018,
+      "last_appearance": null
+    },
+    {
+      "team": "Washington Nationals",
+      "last_win": 2019,
+      "last_appearance": null
+    },
+    {
+      "team": "Los Angeles Dodgers",
+      "last_win": 2020,
+      "last_appearance": null
+    },
+    {
+      "team": "Atlanta Braves",
+      "last_win": 2021,
+      "last_appearance": null
+    },
+    {
+      "team": "Houston Astros",
+      "last_win": 2022,
+      "last_appearance": null
+    },
+    {
+      "team": "Texas Rangers",
+      "last_win": 2023,
+      "last_appearance": null
+    },
+    {
+      "team": "Milwaukee Brewers",
+      "last_win": null,
+      "last_appearance": null
+    },
+    {
+      "team": "San Diego Padres",
+      "last_win": null,
+      "last_appearance": null
+    },
+    {
+      "team": "Seattle Mariners",
+      "last_win": null,
+      "last_appearance": null
+    },
+    {
+      "team": "Colorado Rockies",
+      "last_win": null,
+      "last_appearance": null
+    },
+    {
+      "team": "Tampa Bay Rays",
+      "last_win": null,
+      "last_appearance": null
+    }
+  ]
+}
