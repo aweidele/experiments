@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./App.css";
 
 function App() {
-  const [points, setPoints] = useState([]);
+  const [points, setPoints] = useState([16, 13, 15, 12, 17]);
   const [inputVal, setInputVal] = useState();
 
   const handleChange = (e) => {
@@ -47,8 +47,9 @@ function App() {
       <div className="shrink-0 w-3/4 border border-slate-800">
         <div className="aspect-[10/6]">
           {points.length > 1 && (
-            <svg id="uuid-00adf8eb-3941-42cc-a5a3-ca459bcecf1d" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" className="fill-none stroke-amber-600 stroke-2 w-full">
-              <polyline points={graphPoints} />
+            <svg id="uuid-00adf8eb-3941-42cc-a5a3-ca459bcecf1d" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" className="w-full">
+              <polyline className="fill-amber-500" points={`${graphPoints} 1000 600 0 600`} />
+              <polyline className="fill-transparent stroke-amber-600 stroke-2" points={graphPoints} />
             </svg>
           )}
         </div>

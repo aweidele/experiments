@@ -8,7 +8,10 @@
 
 .chart {
   width: 500px;
-  height: 500px;
+}
+
+.chartSVG {
+  aspect-ratio: 1 /1;
 }
 
 .ring {
@@ -20,10 +23,10 @@
   width: 40%;
 }
 
-.chartSVG {
+/* .chartSVG {
   g,
   path {
-    /* stroke-width: 2px; */
-    /* stroke: #ffffff; */
+    stroke-width: 2px;
+    stroke: #000000;
   }
-}
+} */
