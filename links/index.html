@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>bleh</title>
+  </head>
+  <body>
+    <ul id="meh"></ul>
+    <script>
+      const meh = document.getElementById("meh");
+      const start = 1904;
+      const end = 1882;
+
+      async function fetchAll(urls) {
+        const results = await Promise.all(urls.map((url) => fetch(url).then((response) => response)));
+        return results;
+      }
+
+      async function outputResult(result) {
+        const html = await result.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+        const title = doc.querySelector("title").textContent;
+
+        const li = document.createElement("li");
+        li.innerHTML = `<a href="${result.url}" target="_blank">${title}</a>`;
+        meh.appendChild(li);
+        console.log(title);
+      }
+
+      const nodeURLs = Array.from({ length: start - end }, (_, i) => `https://agents.floodsmart.gov/node/${i + end}`);
+      // nodeURLs.push("https://www.aaronweidele.com/");
+      fetchAll(nodeURLs)
+        .then((results) => {
+          console.log(results);
+          results.forEach((result) => {
+            outputResult(result);
+            // const li = document.createElement("li");
+
+            // li.innerHTML = `<a href="${result.url}" target="_blank">${result.url}</a>`;
+            // meh.appendChild(li);
+          });
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    </script>
+  </body>
+</html>
