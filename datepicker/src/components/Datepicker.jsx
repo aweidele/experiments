@@ -4,7 +4,7 @@ import { Calendar } from "./Calendar";
 import { getMDY } from "../util/dates";
 
 export function Datepicker() {
-  const { selectedStartDate, selectedEndDate } = useContext(DateContext);
+  const { selectedStartDate, selectedEndDate, hoverEndDate } = useContext(DateContext);
 
   const [calendarStart, setCalendarStart] = useState(new Date());
   const [m, d, y] = getMDY(calendarStart);
@@ -37,6 +37,8 @@ export function Datepicker() {
           <Calendar date={new Date(y, m + 1, 1)} />
         </div>
       </div>
+
+      {hoverEndDate && <div className="fixed right-0 bottom-0 p-2">{formatDate(hoverEndDate)}</div>}
     </div>
   );
 }
