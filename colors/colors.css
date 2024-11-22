@@ -1,0 +1,134 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+
+@property --h {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 47;
+}
+@property --s {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 86%;
+}
+@property --l {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 50%;
+}
+@property --r {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 237;
+}
+@property --g {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 190;
+}
+@property --b {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 19;
+}
+@property --hex {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: #edbe13;
+}
+
+@keyframes hexAnimation {
+  0% {
+    background-color: #edbe13;
+  }
+  50% {
+    background-color: #531a82;
+  }
+  100% {
+    background-color: #edbe13;
+  }
+}
+
+@keyframes hslAnimation {
+  0% {
+    --h: 47;
+    --s: 86%;
+    --l: 50%;
+  }
+  50% {
+    --h: 237;
+    --s: 67%;
+    --l: 31%;
+  }
+  100% {
+    --h: 47;
+    --s: 86%;
+    --l: 50%;
+  }
+}
+
+@keyframes rgbAnimation {
+  0% {
+    --r: 237;
+    --g: 190;
+    --b: 19;
+  }
+  50% {
+    --r: 83;
+    --g: 26;
+    --b: 130;
+  }
+  100% {
+    --r: 237;
+    --g: 190;
+    --b: 19;
+  }
+}
+
+body {
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-size: 18px;
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+.wrapper {
+  max-width: 840px;
+  padding: 20px;
+  margin: auto;
+}
+.grid {
+  display: flex;
+  gap: 20px;
+}
+
+.grid > div {
+  text-align: center;
+  flex-grow: 1;
+}
+
+.circle {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 100%;
+  margin: 10px 0;
+}
+
+.hex {
+  background-color: var(--hex);
+  animation: hexAnimation 8s infinite;
+}
+
+.hsl {
+  background-color: hsl(var(--h), var(--s), var(--l));
+  animation: hslAnimation 8s infinite;
+}
+
+.rgb {
+  background-color: rgb(var(--r), var(--g), var(--b));
+  animation: rgbAnimation 8s infinite;
+}

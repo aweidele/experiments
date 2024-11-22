@@ -94,7 +94,7 @@ export function Calendar({ date }) {
         {days.map((d) => (
           <div
             key={d}
-            className={`aspect-square text-center${d === 1 ? ` ${colStart[firstOfMonth]}` : ""}${getClassName(d)}`}
+            className={`aspect-square text-center cursor-pointer${d === 1 ? ` ${colStart[firstOfMonth]}` : ""}${getClassName(d)}`}
             onClick={() => {
               handleDateClick(d);
             }}
