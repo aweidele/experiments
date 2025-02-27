@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Sound</title>
+    <style>
+      body {
+        background-color: #453434;
+      }
+      .piano {
+        display: grid;
+      }
+
+      .piano button {
+        background-color: #ffffff;
+        border: 1px solid #000;
+        height: 100px;
+        cursor: pointer;
+        font-size: 9px;
+        padding: 0;
+      }
+      button {
+        padding: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <button class="btn" data-bass="82.41 " data-freq="329.63" data-harm="415.30">E</button>
+    <button class="btn" data-bass="110" data-freq="440.00" data-harm="554.37">A</button>
+    <button class="btn" data-bass="138.59" data-freq="554.37" data-harm="659.25">C#</button>
+    <button class="btn" data-bass="185" data-freq="739.99" data-harm="932.33">F#</button>
+
+    <script>
+      function playSound(bass, freq, harm) {
+        // Stop after 1 second
+        setTimeout(() => {
+          osc1.stop();
+          osc2.stop();
+          osc3.stop();
+        }, 1000);
+      }
+
+      const buttons = document.querySelectorAll(".btn");
+      buttons.forEach((btn) => {
+        const freq = btn.dataset.freq;
+        const harm = btn.dataset.harm;
+        const bass = btn.dataset.bass;
+
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // Create an oscillator for the E note (329.63 ,)
+        const osc1 = ctx.createOscillator();
+        osc1.type = "sine";
+        osc1.frequency.setValueAtTime(freq, ctx.currentTime); // E4 note
+
+        // Create an oscillator for the B note (987.77 ,) - harmonic
+        const osc2 = ctx.createOscillator();
+        osc2.type = "sine";
+        osc2.frequency.setValueAtTime(harm, ctx.currentTime); // B5 harmonic
+
+        // Create an oscillator for the B note (987.77 ,) - harmonic
+        const osc3 = ctx.createOscillator();
+        osc3.type = "sine";
+        osc3.frequency.setValueAtTime(bass, ctx.currentTime); // B5 harmonic
+
+        // Create a gain node to control volume
+        const gainNode = ctx.createGain();
+        gainNode.gain.value = 0.2; // Reduce volume to avoid distortion
+
+        // Connect oscillators to gain, then to the audio output
+        osc1.connect(gainNode);
+        osc2.connect(gainNode);
+        osc3.connect(gainNode);
+        gainNode.connect(ctx.destination);
+
+        btn.addEventListener("mousedown", () => {
+          osc1.start();
+          osc2.start();
+          osc3.start();
+        });
+        btn.addEventListener("mouseup", () => {
+          osc1.stop();
+          osc2.stop();
+          osc3.stop();
+        });
+      });
+    </script>
+  </body>
+</html>

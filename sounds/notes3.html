@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Note Player</title>
+    <style>
+      button {
+        font-size: 20px;
+        padding: 15px;
+        margin: 10px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <button class="btn" data-bass="82.41 " data-note="329.63" data-harm="415.30">E</button>
+    <button class="btn" data-bass="110" data-note="440.00" data-harm="554.37">A</button>
+    <button class="btn" data-bass="138.59" data-note="554.37" data-harm="659.25">C#</button>
+    <button class="btn" data-bass="185" data-note="739.99" data-harm="932.33">F#</button>
+
+    <script>
+      let audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      let oscillators = {}; // Store active oscillators
+
+      // Fade duration in seconds
+      const fadeDuration = 0.1;
+
+      function startNote(freq) {
+        if (oscillators[freq]) return; // Prevent duplicates
+
+        let osc = audioCtx.createOscillator();
+        let gain = audioCtx.createGain();
+        osc.type = "sine"; // You can change this to 'square', 'sawtooth', or 'triangle'
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        // Fade in
+        gain.gain.setValueAtTime(0, audioCtx.currentTime); // Start at 0 volume
+        gain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + fadeDuration); // Fade to normal volume
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+
+        oscillators[freq] = { osc, gain }; // Store the oscillator
+      }
+
+      function stopNoteWithFade(freq) {
+        if (oscillators[freq]) {
+          const { osc, gain } = oscillators[freq];
+
+          // Fade out
+          gain.gain.setValueAtTime(gain.gain.value, audioCtx.currentTime);
+          gain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + fadeDuration);
+
+          // Stop after fade-out is complete
+          setTimeout(() => {
+            osc.stop();
+            osc.disconnect();
+            gain.disconnect();
+            delete oscillators[freq];
+          }, fadeDuration * 1000); // Wait for fade-out to finish
+        }
+      }
+
+      document.querySelectorAll("button").forEach((button) => {
+        let note = parseFloat(button.dataset.note);
+
+        button.addEventListener("mousedown", () => startNote(note));
+        button.addEventListener("mouseup", () => stopNoteWithFade(note));
+        button.addEventListener("mouseleave", () => stopNoteWithFade(note)); // Stop if mouse leaves
+        button.addEventListener("touchstart", () => startNote(note)); // Mobile support
+        button.addEventListener("touchend", () => stopNoteWithFade(note));
+      });
+    </script>
+  </body>
+</html>
