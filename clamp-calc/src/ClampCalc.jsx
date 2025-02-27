@@ -48,8 +48,9 @@ export const ClampCalc = () => {
       </div>
 
       <div style={{ fontSize: genCalc() }}>
-        <p>Pellentesque commodo eros a enim. Aliquam erat volutpat. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, quis gravida magna mi a libero. Vivamus elementum semper nisi.</p>
-        <p>Sed cursus turpis vitae tortor. Aliquam lobortis. Nullam dictum felis eu pede mollis pretium. Cras id dui.</p>
+        <LoremIpsum p={1} />
+        {/* <p>Pellentesque commodo eros a enim. Aliquam erat volutpat. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, quis gravida magna mi a libero. Vivamus elementum semper nisi.</p>
+        <p>Sed cursus turpis vitae tortor. Aliquam lobortis. Nullam dictum felis eu pede mollis pretium. Cras id dui.</p> */}
       </div>
     </div>
   );
