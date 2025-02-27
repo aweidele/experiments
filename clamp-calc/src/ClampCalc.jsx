@@ -42,7 +42,9 @@ export const ClampCalc = () => {
           <input type="number" value={maxFS} onChange={(e) => setMaxFS(e.target.value)} />
         </label>
       </div>
-      <pre>{genCalc()}</pre>
+      <div className="of">
+        <pre>{genCalc()}</pre>
+      </div>
 
       <div style={{ fontSize: genCalc() }}>
         <p>Pellentesque commodo eros a enim. Aliquam erat volutpat. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, quis gravida magna mi a libero. Vivamus elementum semper nisi.</p>
