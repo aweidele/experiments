@@ -14,7 +14,6 @@ export const ClampCalc = () => {
 
   return (
     <div>
-      <h2 style={{ fontSize: genCalc() }}>Sample Text</h2>
       <div>
         <label>
           Min VP
@@ -44,6 +43,11 @@ export const ClampCalc = () => {
         </label>
       </div>
       <pre>{genCalc()}</pre>
+
+      <div style={{ fontSize: genCalc() }}>
+        <p>Pellentesque commodo eros a enim. Aliquam erat volutpat. Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, quis gravida magna mi a libero. Vivamus elementum semper nisi.</p>
+        <p>Sed cursus turpis vitae tortor. Aliquam lobortis. Nullam dictum felis eu pede mollis pretium. Cras id dui.</p>
+      </div>
     </div>
   );
 };
