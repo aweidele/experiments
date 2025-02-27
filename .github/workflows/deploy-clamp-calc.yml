@@ -1,4 +1,4 @@
-name: Build and Deploy React App via FTP
+name: Deploy Clamp Calculator
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - experiments/clamp-calc
 
 jobs:
-  build-and-deploy:
+  build-clamp-calc:
     runs-on: ubuntu-latest
 
     defaults:

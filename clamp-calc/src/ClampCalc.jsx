@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { LoremIpsum } from "react-lorem-ipsum";
 
 export const ClampCalc = () => {
   const [minVP, setMinVP] = useState(375);
