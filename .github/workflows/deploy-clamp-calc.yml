@@ -34,3 +34,12 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./clamp-calc/dist/ # Ensure this is correct
           server-dir: /public_html/projects.aaronweidele.com/clamp-calculator/ # Adjust your deployment path
+
+      - name: 🚀 Deploy BC
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./barcode/ # Ensure this is correct
+          server-dir: /public_html/projects.aaronweidele.com/barcode/ # Adjust your deployment path
