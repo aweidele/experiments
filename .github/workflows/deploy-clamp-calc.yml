@@ -43,3 +43,32 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./barcode/ # Ensure this is correct
           server-dir: /public_html/projects.aaronweidele.com/barcode/ # Adjust your deployment path
+
+  build-time-calc:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: time-calc
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: 📦 Install Node.js and Dependencies
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18 # Use your Node.js version
+      - run: npm install
+
+      - name: 🔨 Build React App
+        run: npm run build # Change this if your build command is different
+
+      - name: 🚀 Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./time-calc/dist/ # Ensure this is correct
+          server-dir: /public_html/projects.aaronweidele.com/time-calculator/ # Adjust your deployment path
