@@ -17,10 +17,16 @@ function App() {
     let totalM = 0;
 
     times.forEach((time) => {
-      if (time.includes(":")) {
+      // if (time.includes(":")) {
+      if (time) {
         const [h, m] = time.split(":").map((n) => parseInt(n));
-        totalH += h;
-        totalM += Number.isNaN(m) ? 0 : m;
+        console.log(h, m);
+        if (!m || Number.isNaN(m)) {
+          totalM += h;
+        } else {
+          totalH += h;
+          totalM += Number.isNaN(m) ? 0 : m;
+        }
       }
     });
     totalH += Math.floor(totalM / 60);
