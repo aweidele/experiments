@@ -74,3 +74,17 @@ button:focus-visible {
   width: 100%;
   overflow: auto;
 }
+
+.sample-text {
+  position: relative;
+}
+
+.sample-text svg {
+  width: 16px;
+  height: 16px;
+  fill: #fc8803;
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  opacity: 0.5;
+}
