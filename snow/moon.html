@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Moon</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      .wrapper {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #ffffff;
+      }
+
+      svg {
+        width: 200px;
+        height: 200px;
+        fill: #fdf9e0;
+      }
+
+      path {
+        box-shadow: 0 0 10px #ffffff;
+      }
+
+      #moon-container {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+    </style>
+  </head>
+  <body style="background-color: black">
+    <div class="wrapper">
+      <div id="moon-container">
+        <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 400">
+          <path
+            d="
+              M 100, 100
+              m 100, 0
+              a 100,100 0 1,0 -200,0
+              a 100,100 0 1,0  200,0
+              "
+          />
+          <path d="M200,300c0-55.23-44.77-100-100-100,0,0,51,26,51,100s-51,100-51,100c55.23,0,100-44.77,100-100" />
+        </svg>
+      </div>
+    </div>
+  </body>
+</html>

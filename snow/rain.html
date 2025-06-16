@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Diagonal Rain</title>
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        background: #aaa;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="rainCanvas"></canvas>
+
+    <script>
+      const canvas = document.getElementById("rainCanvas");
+      const ctx = canvas.getContext("2d");
+      let width, height;
+      const raindrops = [];
+      const numDrops = 50;
+
+      const raindropImage = new Image();
+      raindropImage.src =
+        "data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iMTIwMHB0IiBoZWlnaHQ9IjEyMDBwdCIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgMTIwMCAxMjAwIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgogPHBhdGggZD0ibTgwOC4yIDI2NC4zYy02MS4zNDgtNzguMjI3LTEyNC43Mi0xNTkuMDctMTc1Ljg4LTI0NS44NS0xMy41LTIyLjg3NS01MS4xNDgtMjIuODc1LTY0LjU3NCAwLTUxLjIyNyA4Ni43NzctMTE0LjYgMTY3LjYyLTE3NS45NSAyNDUuODUtMTI0LjM1IDE1OC42Mi0yNDEuOCAzMDguNDctMjQxLjggNDg1LjcgMCAyNDguMTggMjAxLjgyIDQ1MCA0NTAgNDUwczQ1MC0yMDEuODIgNDUwLTQ1MGMwLTE3Ny4yMy0xMTcuNDUtMzI3LjA3LTI0MS44LTQ4NS43eiIvPgo8L3N2Zz4K";
+
+      function resizeCanvas() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      }
+
+      window.addEventListener("resize", resizeCanvas);
+      resizeCanvas();
+
+      class Raindrop {
+        constructor() {
+          this.reset(true);
+        }
+
+        reset(initial = false) {
+          this.size = Math.random() * 10 + 5;
+          this.x = Math.random() * width + (initial ? -width * 0.5 : 0); // some start off-canvas left
+          this.y = Math.random() * height - height;
+          this.speed = this.size * 2; // faster fall
+          this.opacity = Math.random() * 0.5 + 0.5;
+          this.angle = -0.4; // stronger diagonal
+        }
+
+        update() {
+          this.x += this.angle * this.speed;
+          this.y += this.speed;
+
+          if (this.y > height || this.x < -50 || this.x > width + 50) {
+            this.reset();
+          }
+        }
+
+        draw(ctx) {
+          ctx.save();
+          ctx.globalAlpha = this.opacity;
+          ctx.translate(this.x, this.y);
+          // ctx.rotate(Math.atan2(this.speed, this.angle * this.speed)); // rotate in fall direction
+          ctx.drawImage(raindropImage, -this.size / 2, -this.size, this.size, this.size * 2);
+          ctx.restore();
+          ctx.globalAlpha = 1;
+        }
+      }
+
+      for (let i = 0; i < numDrops; i++) {
+        raindrops.push(new Raindrop());
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+        raindrops.forEach((drop) => {
+          drop.update();
+          drop.draw(ctx);
+        });
+        requestAnimationFrame(animate);
+      }
+
+      raindropImage.onload = () => {
+        animate();
+      };
+    </script>
+  </body>
+</html>
