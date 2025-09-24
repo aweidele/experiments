@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Forest Sunlight Canvas Animation</title>
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background: #000;
+      }
+      canvas {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="forestCanvas"></canvas>
+    <script>
+      const canvas = document.getElementById("forestCanvas");
+      const ctx = canvas.getContext("2d");
+      let width, height;
+
+      function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+      }
+      window.addEventListener("resize", resize);
+      resize();
+
+      // Tree silhouette
+      function drawTrees() {
+        ctx.fillStyle = "#1a3a1a";
+        ctx.beginPath();
+        ctx.moveTo(0, height * 0.6);
+        for (let i = 0; i <= width; i += 50) {
+          const treeHeight = Math.random() * 100 + 100;
+          ctx.lineTo(i, height * 0.6 - treeHeight);
+          ctx.lineTo(i + 25, height * 0.6);
+        }
+        ctx.lineTo(width, height);
+        ctx.lineTo(0, height);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      // Sun rays
+      const rays = [];
+      for (let i = 0; i < 20; i++) {
+        rays.push({
+          x: Math.random() * width,
+          y: -height,
+          width: Math.random() * 30 + 20,
+          speed: Math.random() * 0.2 + 0.05,
+          opacity: Math.random() * 0.2 + 0.05,
+        });
+      }
+
+      function drawRays() {
+        rays.forEach((ray) => {
+          ctx.save();
+          ctx.globalAlpha = ray.opacity;
+          const grad = ctx.createLinearGradient(ray.x, 0, ray.x + ray.width, height);
+          grad.addColorStop(0, "rgba(255,255,255,0)");
+          grad.addColorStop(0.5, "rgba(255,255,200,0.1)");
+          grad.addColorStop(1, "rgba(255,255,255,0)");
+          ctx.fillStyle = grad;
+          ctx.fillRect(ray.x, 0, ray.width, height);
+          ctx.restore();
+
+          ray.y += ray.speed;
+          ray.x += Math.sin(ray.y * 0.01) * 0.5; // slight sway
+          if (ray.y > height) {
+            ray.y = -height;
+            ray.x = Math.random() * width;
+          }
+        });
+      }
+
+      function drawBackground() {
+        const grad = ctx.createLinearGradient(0, 0, 0, height);
+        grad.addColorStop(0, "#aaccff");
+        grad.addColorStop(1, "#336633");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, width, height);
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+        drawBackground();
+        drawRays();
+        drawTrees();
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    </script>
+  </body>
+</html>

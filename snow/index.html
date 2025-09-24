@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Interactive Snowfall</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: #0a0a1f;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="snowCanvas"></canvas>
+    <script>
+      const canvas = document.getElementById("snowCanvas");
+      const ctx = canvas.getContext("2d");
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener("resize", resizeCanvas);
+      resizeCanvas();
+
+      const snowflakePaths = ["./SnowflakeBundle-02.svg", "./SnowflakeBundle-04.svg", "./SnowflakeBundle-08.svg"];
+
+      const isMobile = /Mobi|Android/i.test(navigator.userAgent) || window.innerWidth < 768;
+      const FLAKE_COUNT = isMobile ? 40 : 150;
+
+      // Mouse tracking
+      const mouse = {
+        x: null,
+        y: null,
+        radius: 100,
+      };
+
+      window.addEventListener("mousemove", (e) => {
+        const rect = canvas.getBoundingClientRect();
+        mouse.x = e.clientX - rect.left;
+        mouse.y = e.clientY - rect.top;
+      });
+
+      function loadImageAsCanvasTinted(src, color) {
+        return new Promise((resolve) => {
+          const img = new Image();
+          img.onload = () => {
+            const offCanvas = document.createElement("canvas");
+            const size = Math.max(img.width, img.height);
+            offCanvas.width = size;
+            offCanvas.height = size;
+            const offCtx = offCanvas.getContext("2d");
+
+            offCtx.fillStyle = color;
+            offCtx.fillRect(0, 0, size, size);
+            offCtx.globalCompositeOperation = "destination-in";
+            offCtx.drawImage(img, 0, 0, size, size);
+            resolve(offCanvas);
+          };
+          img.src = src;
+        });
+      }
+
+      class Snowflake {
+        constructor(image, size, x, y, speedY, driftSpeed, rotationSpeed) {
+          this.image = image;
+          this.size = size;
+          this.x = x;
+          this.y = y;
+          this.initialX = x;
+          this.speedY = speedY;
+          this.driftSpeed = driftSpeed;
+          this.rotation = Math.random() * Math.PI * 2;
+          this.rotationSpeed = rotationSpeed;
+          this.driftAngle = Math.random() * Math.PI * 2;
+          this.windX = 0;
+        }
+
+        update() {
+          // Wind drift
+          this.driftAngle += this.driftSpeed;
+          this.x += Math.sin(this.driftAngle) * 0.5 + this.windX;
+
+          this.y += this.speedY;
+          this.rotation += this.rotationSpeed;
+
+          // Mouse wind effect
+          if (mouse.x !== null && mouse.y !== null) {
+            const dx = this.x - mouse.x;
+            const dy = this.y - mouse.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < mouse.radius) {
+              const force = (mouse.radius - distance) / mouse.radius;
+              this.windX = 1.5 * force * (dx / distance);
+            } else {
+              this.windX *= 0.95; // decay over time
+            }
+          }
+
+          // Reset
+          if (this.y > canvas.height + this.size) {
+            this.y = -this.size;
+            this.x = this.initialX = Math.random() * canvas.width;
+            this.driftAngle = Math.random() * Math.PI * 2;
+            this.windX = 0;
+          }
+        }
+
+        draw(ctx) {
+          ctx.save();
+          ctx.translate(this.x, this.y);
+          ctx.rotate(this.rotation);
+          ctx.drawImage(this.image, -this.size / 2, -this.size / 2, this.size, this.size);
+          ctx.restore();
+        }
+      }
+
+      async function initSnowflakes() {
+        const snowflakes = [];
+
+        for (let i = 0; i < FLAKE_COUNT; i++) {
+          const svg = snowflakePaths[Math.floor(Math.random() * snowflakePaths.length)];
+          const color = Math.random() < 0.5 ? "#FFFFFF" : "#C5DEF9";
+          const tintedImg = await loadImageAsCanvasTinted(svg, color);
+
+          const size = Math.random() * 20 + 10;
+          const speedY = size / 10;
+          const driftSpeed = 0.01 + Math.random() * 0.01;
+          const rotationSpeed = (Math.random() - 0.5) * 0.02;
+
+          snowflakes.push(new Snowflake(tintedImg, size, Math.random() * canvas.width, Math.random() * canvas.height, speedY, driftSpeed, rotationSpeed));
+        }
+
+        return snowflakes;
+      }
+
+      (async function start() {
+        const snowflakes = await initSnowflakes();
+
+        function animate() {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          for (const flake of snowflakes) {
+            flake.update();
+            flake.draw(ctx);
+          }
+          requestAnimationFrame(animate);
+        }
+
+        animate();
+      })();
+    </script>
+  </body>
+</html>

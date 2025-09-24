@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Hex Mosaic (Average Color per Hex)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      body {
+        margin: 0;
+        font: 14px/1.4 system-ui, sans-serif;
+      }
+      header {
+        padding: 12px;
+        display: grid;
+        gap: 8px;
+        grid-template-columns: 1fr;
+        border-bottom: 1px solid #ccc;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+      }
+      label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+      }
+      input[type="range"] {
+        width: 200px;
+      }
+      canvas {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+      .pill {
+        padding: 4px 8px;
+        border: 1px solid #999;
+        border-radius: 999px;
+      }
+      .spacer {
+        flex: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="row">
+        <label
+          >Image URL:
+          <input id="imgUrl" type="text" size="40" value="flower.jpeg" />
+        </label>
+        <label class="pill"
+          >or Upload:
+          <input id="fileInput" type="file" accept="image/*" />
+        </label>
+        <span class="spacer"></span>
+        <button id="renderBtn">Render</button>
+      </div>
+      <div class="row">
+        <label
+          >Hex size (px)
+          <input id="hexSize" type="range" min="0" max="120" value="24" />
+          <output id="hexSizeOut">24</output>
+        </label>
+        <label
+          >Sample stride (px)
+          <input id="stride" type="range" min="1" max="8" value="2" />
+          <output id="strideOut">2</output>
+        </label>
+        <label
+          >Gap width
+          <input id="gapWidth" type="range" min="0" max="8" step="0.1" value="1" />
+          <output id="gapWidthOut">0</output> px
+        </label>
+        <label><input id="fitToWidth" type="checkbox" checked /> Fit canvas to window width</label>
+      </div>
+    </header>
+
+    <canvas id="c"></canvas>
+
+    <script>
+      // --- DOM refs ---
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+
+      const imgUrlInput = document.getElementById("imgUrl");
+      const fileInput = document.getElementById("fileInput");
+      const renderBtn = document.getElementById("renderBtn");
+      const hexSizeInput = document.getElementById("hexSize");
+      const hexSizeOut = document.getElementById("hexSizeOut");
+      const strideInput = document.getElementById("stride");
+      const strideOut = document.getElementById("strideOut");
+      const gapWidthInput = document.getElementById("gapWidth");
+      const gapWidthOut = document.getElementById("gapWidthOut");
+      const fitToWidthInput = document.getElementById("fitToWidth");
+
+      hexSizeInput.addEventListener("input", () => (hexSizeOut.value = hexSizeInput.value));
+      strideInput.addEventListener("input", () => (strideOut.value = strideInput.value));
+
+      gapWidthInput.addEventListener("input", () => (gapWidthOut.value = gapWidthInput.value));
+
+      // --- Utility: load image (URL or File) ---
+      function loadImage(src) {
+        return new Promise((resolve, reject) => {
+          const img = new Image();
+          img.crossOrigin = "anonymous"; // allow CORS for picsum/photos and similar
+          img.onload = () => resolve(img);
+          img.onerror = reject;
+          img.src = src;
+        });
+      }
+
+      function loadImageFromFile(file) {
+        return new Promise((resolve, reject) => {
+          const r = new FileReader();
+          r.onload = () => resolve(loadImage(r.result));
+          r.onerror = reject;
+          r.readAsDataURL(file);
+        });
+      }
+
+      // --- Hex math (flat-topped hexes) ---
+      // r: hex "radius" = center -> corner horizontally
+      // width = 2r; height = sqrt(3) * r
+      // Horizontal center spacing = 1.5r; vertical center spacing = sqrt(3) * r / 2 * 2 = sqrt(3) * r
+      const SQRT3 = Math.sqrt(3);
+
+      function hexVertices(cx, cy, r) {
+        // Flat-topped hex: start angle = 0 -> (r, 0)
+        const verts = [];
+        for (let i = 0; i < 6; i++) {
+          const angle = (Math.PI / 180) * (60 * i);
+          verts.push([cx + r * Math.cos(angle), cy + r * Math.sin(angle)]);
+        }
+        return verts;
+      }
+
+      function pointInPolygon(px, py, verts) {
+        // Winding algorithm (ray-casting)
+        let inside = false;
+        for (let i = 0, j = verts.length - 1; i < verts.length; j = i++) {
+          const [xi, yi] = verts[i];
+          const [xj, yj] = verts[j];
+          const intersect = yi > py !== yj > py && px < ((xj - xi) * (py - yi)) / (yj - yi + 0.0000001) + xi;
+          if (intersect) inside = !inside;
+        }
+        return inside;
+      }
+
+      function clamp(v, lo, hi) {
+        return Math.max(lo, Math.min(hi, v));
+      }
+
+      // --- Core: render hex mosaic using average color per hex ---
+      async function renderHexMosaic(image) {
+        const fitToWidth = fitToWidthInput.checked;
+        const dpr = window.devicePixelRatio || 1;
+
+        let displayW = image.naturalWidth;
+        let displayH = image.naturalHeight;
+        if (fitToWidth) {
+          const maxDisplayW = Math.min(document.body.clientWidth, image.naturalWidth);
+          const scale = maxDisplayW / image.naturalWidth;
+          displayW = Math.round(image.naturalWidth * scale);
+          displayH = Math.round(image.naturalHeight * scale);
+        }
+
+        canvas.width = Math.round(displayW * dpr);
+        canvas.height = Math.round(displayH * dpr);
+        canvas.style.width = displayW + "px";
+        canvas.style.height = displayH + "px";
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        // 👇 --- NEW: if hex size is 0, show original image and stop ---
+        const r = parseInt(hexSizeInput.value, 10);
+        if (r === 0) {
+          ctx.clearRect(0, 0, displayW, displayH);
+          ctx.drawImage(image, 0, 0, displayW, displayH);
+          return; // skip the mosaic code entirely
+        }
+        // 👆 ---------------------------------------------
+
+        ctx.clearRect(0, 0, displayW, displayH);
+
+        const off = document.createElement("canvas");
+        off.width = displayW;
+        off.height = displayH;
+        const offCtx = off.getContext("2d", { willReadFrequently: true });
+        offCtx.drawImage(image, 0, 0, displayW, displayH);
+        const imgData = offCtx.getImageData(0, 0, displayW, displayH);
+        const data = imgData.data;
+
+        const stride = parseInt(strideInput.value, 10);
+        const gap = parseFloat(gapWidthInput.value);
+
+        const hexHeight = SQRT3 * r;
+        const horizStep = 1.5 * r;
+        const vertStep = hexHeight;
+
+        // Precompute for speed
+        function avgColorForHex(cx, cy, verts) {
+          // Bounding box to limit sampling
+          let minX = Infinity,
+            minY = Infinity,
+            maxX = -Infinity,
+            maxY = -Infinity;
+          for (const [x, y] of verts) {
+            if (x < minX) minX = x;
+            if (y < minY) minY = y;
+            if (x > maxX) maxX = x;
+            if (y > maxY) maxY = y;
+          }
+          minX = Math.floor(clamp(minX, 0, displayW - 1));
+          minY = Math.floor(clamp(minY, 0, displayH - 1));
+          maxX = Math.ceil(clamp(maxX, 0, displayW - 1));
+          maxY = Math.ceil(clamp(maxY, 0, displayH - 1));
+
+          let rSum = 0,
+            gSum = 0,
+            bSum = 0,
+            count = 0;
+
+          // Sample pixels at "stride" steps and only include those inside the hex polygon
+          for (let y = minY; y <= maxY; y += stride) {
+            for (let x = minX; x <= maxX; x += stride) {
+              if (!pointInPolygon(x + 0.5, y + 0.5, verts)) continue;
+              const idx = (y * displayW + x) * 4;
+              rSum += data[idx];
+              gSum += data[idx + 1];
+              bSum += data[idx + 2];
+              count++;
+            }
+          }
+
+          if (count === 0) {
+            // Fallback: sample the center pixel if our stride skipped everything
+            const cxClamped = clamp(Math.round(cx), 0, displayW - 1);
+            const cyClamped = clamp(Math.round(cy), 0, displayH - 1);
+            const idx = (cyClamped * displayW + cxClamped) * 4;
+            return `rgb(${data[idx]}, ${data[idx + 1]}, ${data[idx + 2]})`;
+          }
+
+          const rAvg = Math.round(rSum / count);
+          const gAvg = Math.round(gSum / count);
+          const bAvg = Math.round(bSum / count);
+          return `rgb(${rAvg}, ${gAvg}, ${bAvg})`;
+        }
+
+        // Full-bleed hex coverage without double-offset or gaps
+        const startCol = -1; // start one column off-screen on the left
+        const endX = displayW + r; // draw until right edge is covered
+
+        for (let col = startCol; ; col++) {
+          const x = r + col * (1.5 * r); // horizStep = 1.5r
+          if (x - r > endX) break; // done when the left edge of this col is past right bound
+
+          const offsetY = col & 1 ? (SQRT3 * r) / 2 : 0; // odd columns shift down by half hex height
+          const startY = -(SQRT3 * r) / 2 + offsetY; // begin half a hex above the top
+          const endY = displayH + (SQRT3 * r) / 2; // end half a hex below the bottom
+
+          for (let y = startY; y <= endY; y += SQRT3 * r) {
+            // vertStep = hexHeight = √3 r
+            const verts = hexVertices(x, y, r);
+            const fill = avgColorForHex(x, y, verts);
+
+            ctx.beginPath();
+            ctx.moveTo(verts[0][0], verts[0][1]);
+            for (let i = 1; i < 6; i++) ctx.lineTo(verts[i][0], verts[i][1]);
+            ctx.closePath();
+            ctx.fillStyle = fill;
+            ctx.fill();
+
+            const gap = parseFloat(gapWidthInput.value);
+            if (gap > 0) {
+              // Punch out transparency along the edges = visible spacing between cells
+              ctx.save();
+              ctx.globalCompositeOperation = "destination-out";
+              ctx.lineWidth = gap;
+              ctx.lineJoin = "round"; // smoother intersections; try 'miter' for sharper
+              ctx.strokeStyle = "rgba(0,0,0,1)"; // color is irrelevant in destination-out
+              ctx.stroke();
+              ctx.restore();
+            }
+          }
+        }
+        // … your hex-drawing loop continues unchanged …
+      }
+
+      // --- Wiring ---
+      let currentImage = null;
+
+      async function loadCurrentImage() {
+        if (fileInput.files && fileInput.files[0]) {
+          currentImage = await loadImageFromFile(fileInput.files[0]);
+        } else {
+          currentImage = await loadImage(imgUrlInput.value.trim());
+        }
+      }
+
+      async function go() {
+        try {
+          if (!currentImage) await loadCurrentImage();
+          await renderHexMosaic(currentImage);
+        } catch (err) {
+          console.error(err);
+          alert("Failed to render. Check the image URL (CORS) or try uploading a file.");
+        }
+      }
+
+      renderBtn.addEventListener("click", async () => {
+        // If URL changed, reload
+        if (!fileInput.files[0]) {
+          currentImage = null;
+        }
+        await go();
+      });
+
+      // Re-render on control changes (cheap-ish)
+      [hexSizeInput, strideInput, gapWidthInput, fitToWidthInput].forEach((el) => {
+        el.addEventListener("input", () => {
+          if (currentImage) go();
+        });
+      });
+
+      // Initial render
+      (async () => {
+        await go();
+      })();
+    </script>
+  </body>
+</html>
