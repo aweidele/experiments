@@ -38,7 +38,6 @@
         display: block;
         width: 100%;
         height: auto;
-        background: #111;
       }
       .pill {
         padding: 4px 8px;
@@ -76,9 +75,9 @@
           <output id="strideOut">2</output>
         </label>
         <label
-          >Outline width
-          <input id="outlineWidth" type="range" min="0" max="5" step="0.1" value="0.5" />
-          <output id="outlineWidthOut">0.5</output> px
+          >Gap width
+          <input id="gapWidth" type="range" min="0" max="8" step="0.1" value="1" />
+          <output id="gapWidthOut">0</output> px
         </label>
         <label><input id="fitToWidth" type="checkbox" checked /> Fit canvas to window width</label>
       </div>
@@ -98,14 +97,14 @@
       const hexSizeOut = document.getElementById("hexSizeOut");
       const strideInput = document.getElementById("stride");
       const strideOut = document.getElementById("strideOut");
-      const outlineWidthInput = document.getElementById("outlineWidth");
-      const outlineWidthOut = document.getElementById("outlineWidthOut");
+      const gapWidthInput = document.getElementById("gapWidth");
+      const gapWidthOut = document.getElementById("gapWidthOut");
       const fitToWidthInput = document.getElementById("fitToWidth");
 
       hexSizeInput.addEventListener("input", () => (hexSizeOut.value = hexSizeInput.value));
       strideInput.addEventListener("input", () => (strideOut.value = strideInput.value));
 
-      outlineWidthInput.addEventListener("input", () => (outlineWidthOut.value = outlineWidthInput.value));
+      gapWidthInput.addEventListener("input", () => (gapWidthOut.value = gapWidthInput.value));
 
       // --- Utility: load image (URL or File) ---
       function loadImage(src) {
@@ -199,7 +198,7 @@
         const data = imgData.data;
 
         const stride = parseInt(strideInput.value, 10);
-        const drawOutlines = outlineWidthInput.value > 0;
+        const gap = parseFloat(gapWidthInput.value);
 
         const hexHeight = SQRT3 * r;
         const horizStep = 1.5 * r;
@@ -278,11 +277,16 @@
             ctx.fillStyle = fill;
             ctx.fill();
 
-            if (drawOutlines) {
-              ctx.lineWidth = parseFloat(outlineWidthInput.value);
-              ctx.lineJoin = "round";
-              ctx.strokeStyle = "rgba(0,0,0,0.25)";
+            const gap = parseFloat(gapWidthInput.value);
+            if (gap > 0) {
+              // Punch out transparency along the edges = visible spacing between cells
+              ctx.save();
+              ctx.globalCompositeOperation = "destination-out";
+              ctx.lineWidth = gap;
+              ctx.lineJoin = "round"; // smoother intersections; try 'miter' for sharper
+              ctx.strokeStyle = "rgba(0,0,0,1)"; // color is irrelevant in destination-out
               ctx.stroke();
+              ctx.restore();
             }
           }
         }
@@ -319,7 +323,7 @@
       });
 
       // Re-render on control changes (cheap-ish)
-      [hexSizeInput, strideInput, outlineWidthInput, fitToWidthInput].forEach((el) => {
+      [hexSizeInput, strideInput, gapWidthInput, fitToWidthInput].forEach((el) => {
         el.addEventListener("input", () => {
           if (currentImage) go();
         });
