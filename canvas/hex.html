@@ -243,20 +243,23 @@
           return `rgb(${rAvg}, ${gAvg}, ${bAvg})`;
         }
 
-        // Iterate hex centers across the canvas
-        // Flat-top layout: columns step by 1.5r; odd columns are vertically offset by hexHeight/2
-        for (let col = 0, x = r; x - r < displayW; col++, x = r + col * horizStep) {
-          const colOffsetY = col % 2 === 0 ? 0 : hexHeight / 2;
-          for (let y = colOffsetY + hexHeight / 2; y - hexHeight / 2 < displayH; y += vertStep) {
-            // Skip hexes whose center is clearly outside (padding a bit to avoid partials off edges)
-            if (x + r < 0 || x - r > displayW || y + hexHeight / 2 < 0 || y - hexHeight / 2 > displayH) {
-              continue;
-            }
+        // Full-bleed hex coverage without double-offset or gaps
+        const startCol = -1; // start one column off-screen on the left
+        const endX = displayW + r; // draw until right edge is covered
 
+        for (let col = startCol; ; col++) {
+          const x = r + col * (1.5 * r); // horizStep = 1.5r
+          if (x - r > endX) break; // done when the left edge of this col is past right bound
+
+          const offsetY = col & 1 ? (SQRT3 * r) / 2 : 0; // odd columns shift down by half hex height
+          const startY = -(SQRT3 * r) / 2 + offsetY; // begin half a hex above the top
+          const endY = displayH + (SQRT3 * r) / 2; // end half a hex below the bottom
+
+          for (let y = startY; y <= endY; y += SQRT3 * r) {
+            // vertStep = hexHeight = √3 r
             const verts = hexVertices(x, y, r);
             const fill = avgColorForHex(x, y, verts);
 
-            // Draw hex
             ctx.beginPath();
             ctx.moveTo(verts[0][0], verts[0][1]);
             for (let i = 1; i < 6; i++) ctx.lineTo(verts[i][0], verts[i][1]);
@@ -266,6 +269,7 @@
 
             if (drawOutlines) {
               ctx.lineWidth = 0.5;
+              ctx.lineJoin = "round";
               ctx.strokeStyle = "rgba(0,0,0,0.25)";
               ctx.stroke();
             }

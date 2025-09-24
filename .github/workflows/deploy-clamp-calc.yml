@@ -43,6 +43,14 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./barcode/ # Ensure this is correct
           server-dir: /public_html/projects.aaronweidele.com/barcode/ # Adjust your deployment path
+      - name: 🚀 Deploy Canvas
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./canvas/ # Ensure this is correct
+          server-dir: /public_html/projects.aaronweidele.com/canvas/ # Adjust your deployment path
 
   build-time-calc:
     runs-on: ubuntu-latest
