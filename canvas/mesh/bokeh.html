@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Bokeh Canvas Animation</title>
+    <style>
+      body {
+        margin: 0;
+        background: #000;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="bokeh"></canvas>
+    <script>
+      const canvas = document.getElementById("bokeh");
+      const ctx = canvas.getContext("2d");
+      resizeCanvas();
+
+      window.addEventListener("resize", resizeCanvas);
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+
+      const NUM_CIRCLES = 60;
+      const colors = ["#f896d8", "#ca7df9", "#edf67d", "#724cf9", "#ffffff"];
+      const circles = [];
+
+      function random(min, max) {
+        return Math.random() * (max - min) + min;
+      }
+
+      for (let i = 0; i < NUM_CIRCLES; i++) {
+        circles.push({
+          x: random(0, canvas.width),
+          y: random(0, canvas.height),
+          radius: random(20, 100),
+          color: colors[Math.floor(Math.random() * colors.length)],
+          blur: random(10, 40),
+          alpha: random(0.2, 0.8),
+          dx: random(-0.2, 0.2),
+          dy: random(-0.2, 0.2),
+          fadeSpeed: random(0.001, 0.003),
+        });
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (const c of circles) {
+          c.x += c.dx;
+          c.y += c.dy;
+
+          if (c.x < -c.radius) c.x = canvas.width + c.radius;
+          if (c.x > canvas.width + c.radius) c.x = -c.radius;
+          if (c.y < -c.radius) c.y = canvas.height + c.radius;
+          if (c.y > canvas.height + c.radius) c.y = -c.radius;
+
+          c.alpha += (Math.random() - 0.5) * c.fadeSpeed;
+          c.alpha = Math.max(0.1, Math.min(0.8, c.alpha));
+
+          ctx.globalAlpha = c.alpha;
+          ctx.filter = `blur(${c.blur}px)`;
+          ctx.fillStyle = c.color;
+          ctx.beginPath();
+          ctx.arc(c.x, c.y, c.radius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.globalAlpha = 1;
+        ctx.filter = "none";
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    </script>
+  </body>
+</html>
