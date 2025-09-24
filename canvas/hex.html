@@ -67,7 +67,7 @@
       <div class="row">
         <label
           >Hex size (px)
-          <input id="hexSize" type="range" min="1" max="120" value="24" />
+          <input id="hexSize" type="range" min="0" max="120" value="24" />
           <output id="hexSizeOut">24</output>
         </label>
         <label
@@ -154,13 +154,11 @@
 
       // --- Core: render hex mosaic using average color per hex ---
       async function renderHexMosaic(image) {
-        // Optionally fit canvas width to viewport; otherwise use image size
         const fitToWidth = fitToWidthInput.checked;
         const dpr = window.devicePixelRatio || 1;
 
         let displayW = image.naturalWidth;
         let displayH = image.naturalHeight;
-
         if (fitToWidth) {
           const maxDisplayW = Math.min(document.body.clientWidth, image.naturalWidth);
           const scale = maxDisplayW / image.naturalWidth;
@@ -173,21 +171,27 @@
         canvas.style.width = displayW + "px";
         canvas.style.height = displayH + "px";
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        // 👇 --- NEW: if hex size is 0, show original image and stop ---
+        const r = parseInt(hexSizeInput.value, 10);
+        if (r === 0) {
+          ctx.clearRect(0, 0, displayW, displayH);
+          ctx.drawImage(image, 0, 0, displayW, displayH);
+          return; // skip the mosaic code entirely
+        }
+        // 👆 ---------------------------------------------
+
         ctx.clearRect(0, 0, displayW, displayH);
 
-        // Offscreen canvas at display resolution for sampling pixels
         const off = document.createElement("canvas");
         off.width = displayW;
         off.height = displayH;
         const offCtx = off.getContext("2d", { willReadFrequently: true });
-        // Draw the image scaled to display size
         offCtx.drawImage(image, 0, 0, displayW, displayH);
         const imgData = offCtx.getImageData(0, 0, displayW, displayH);
-        const data = imgData.data; // RGBA flat array
+        const data = imgData.data;
 
-        // Controls
-        const r = parseInt(hexSizeInput.value, 10); // hex radius (px)
-        const stride = parseInt(strideInput.value, 10); // sample stride (px) inside each hex
+        const stride = parseInt(strideInput.value, 10);
         const drawOutlines = outlinesInput.checked;
 
         const hexHeight = SQRT3 * r;
@@ -275,6 +279,7 @@
             }
           }
         }
+        // … your hex-drawing loop continues unchanged …
       }
 
       // --- Wiring ---
