@@ -75,7 +75,11 @@
           <input id="stride" type="range" min="1" max="8" value="2" />
           <output id="strideOut">2</output>
         </label>
-        <label><input id="outlines" type="checkbox" checked /> Outlines</label>
+        <label
+          >Outline width
+          <input id="outlineWidth" type="range" min="0" max="5" step="0.1" value="0.5" />
+          <output id="outlineWidthOut">0.5</output> px
+        </label>
         <label><input id="fitToWidth" type="checkbox" checked /> Fit canvas to window width</label>
       </div>
     </header>
@@ -94,11 +98,14 @@
       const hexSizeOut = document.getElementById("hexSizeOut");
       const strideInput = document.getElementById("stride");
       const strideOut = document.getElementById("strideOut");
-      const outlinesInput = document.getElementById("outlines");
+      const outlineWidthInput = document.getElementById("outlineWidth");
+      const outlineWidthOut = document.getElementById("outlineWidthOut");
       const fitToWidthInput = document.getElementById("fitToWidth");
 
       hexSizeInput.addEventListener("input", () => (hexSizeOut.value = hexSizeInput.value));
       strideInput.addEventListener("input", () => (strideOut.value = strideInput.value));
+
+      outlineWidthInput.addEventListener("input", () => (outlineWidthOut.value = outlineWidthInput.value));
 
       // --- Utility: load image (URL or File) ---
       function loadImage(src) {
@@ -192,7 +199,7 @@
         const data = imgData.data;
 
         const stride = parseInt(strideInput.value, 10);
-        const drawOutlines = outlinesInput.checked;
+        const drawOutlines = outlineWidthInput.value > 0;
 
         const hexHeight = SQRT3 * r;
         const horizStep = 1.5 * r;
@@ -272,7 +279,7 @@
             ctx.fill();
 
             if (drawOutlines) {
-              ctx.lineWidth = 0.5;
+              ctx.lineWidth = parseFloat(outlineWidthInput.value);
               ctx.lineJoin = "round";
               ctx.strokeStyle = "rgba(0,0,0,0.25)";
               ctx.stroke();
@@ -312,8 +319,8 @@
       });
 
       // Re-render on control changes (cheap-ish)
-      [hexSizeInput, strideInput, outlinesInput, fitToWidthInput].forEach((el) => {
-        el.addEventListener("change", () => {
+      [hexSizeInput, strideInput, outlineWidthInput, fitToWidthInput].forEach((el) => {
+        el.addEventListener("input", () => {
           if (currentImage) go();
         });
       });
